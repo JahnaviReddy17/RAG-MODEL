@@ -52,7 +52,7 @@ Sub-question answers are combined into a final coherent response.
 ⚙️ Setup Instructions
 
 # 1. Clone the repository
-git clone https://github.com/your-username/RAG-MODEL.git
+git clone https://github.com/JahnaviReddy17/RAG-MODEL.git
 cd RAG-MODEL
 
 # 2. Create a virtual environment
