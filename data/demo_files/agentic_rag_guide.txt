@@ -1,0 +1,39 @@
+# Agentic Retrieval-Augmented Generation (Agentic RAG) Guide
+
+## 1. Overview of Retrieval-Augmented Generation (RAG)
+Retrieval-Augmented Generation (RAG) is an architectural pattern that optimizes the output of a Large Language Model (LLM) by referencing an authoritative, external knowledge base before generating a response. 
+Standard LLMs are trained on vast, static datasets. This makes them prone to "hallucinations" (generating plausible-sounding but false information) when queried about:
+* Real-time or current events
+* Proprietary or private enterprise documents
+* highly niche or specialized scientific domains
+
+RAG solves this by implementing a two-phase process:
+1. **Retrieval**: Querying a document index (typically a Vector Database using vector embeddings) to find sections of text relevant to the user's prompt.
+2. **Generation**: Appending the retrieved context directly to the user's original query and passing it to the LLM, instructing it to answer using ONLY the provided text.
+
+## 2. Transitioning to Agentic RAG
+While standard RAG is highly effective for simple questions, it suffers from several limitations:
+* **Passive Retrieval**: Standard RAG retrieves documents once and generates a response. If the retrieved documents are irrelevant, the answer will be poor.
+* **Lack of Query Reformulation**: If a query is poorly phrased, passive retrieval will fail to find the right documents.
+* **No Verification**: Passive RAG does not evaluate if the retrieved documents actually answer the question, or if the generated answer is grounded in the source text.
+
+**Agentic RAG** introduces an active "Agent" loop that can make autonomous decisions:
+1. **Query Deconstruction**: The agent breaks complex queries into multiple simple sub-questions, retrieving facts for each sequentially or in parallel.
+2. **Dynamic Routing**: The agent decides whether it needs to query a vector database, search the web, calculate a mathematical formula, or respond directly using chat history.
+3. **Retrieval Assessment**: The agent checks the similarity scores and contents of the retrieved documents. If they are irrelevant, it reformulates the search query and tries again.
+4. **Self-Correction (Self-RAG)**: The agent critiques its own generated answers. If it detects a hallucination (an answer that contains details not found in the source documents), it discards the answer and refines the generation prompt.
+
+## 3. Core Architectural Modules of this Project
+This application implements a modular RAG pipeline structured as follows:
+
+* **Document Ingestion (`pipeline/ingestion/pdf_loader.py`)**: Supports ingestion of multiple formats, including PDF, DOCX, CSV, XML, and TXT files. It reads raw text and preserves document metadata (such as the source filename and file type) to ensure full source attribution in answers.
+* **Text Processing (`pipeline/processing/text_splitter.py`)**: Uses a `RecursiveCharacterTextSplitter` to partition documents into manageable, overlapping text chunks. Chunk size and overlap are critical parameters: too small, and semantic context is lost; too large, and retrieved contexts introduce noise and exceed the LLM's context window.
+* **Vector Store & Indexing (`pipeline/vectorstore/chroma_store.py`)**: Integrates with **ChromaDB**, an open-source, highly performant vector database. Text chunks are transformed into 384-dimensional dense vector embeddings using the `all-MiniLM-L6-v2` SentenceTransformer model. These embeddings are stored and indexed using HNSW (Hierarchical Navigable Small World) graphs for sub-millisecond similarity search.
+* **Retrieval Controller (`pipeline/retrieval/retriever.py`)**: Computes the cosine similarity between the query vector embedding and the stored document chunk vectors. It filters out chunks below a customizable confidence threshold and returns the top-K matches.
+* **Agentic Orchestrator (`pipeline/agent/agentic.py`)**: The control center. It routes the prompt, compiles the strict grounding instructions, triggers the Groq LLM (using high-speed Llama architectures), and executes a post-generation validation check to enforce absolute factual alignment and prevent hallucinations.
+
+## 4. Key Performance Tuning Tips
+To achieve production-grade performance with this RAG model:
+1. **Optimal Chunking**: For standard text, a chunk size of 500-1000 characters with a 10% overlap is standard. For dense source code or legal documents, smaller chunks with higher overlap are preferred.
+2. **Groq Acceleration**: Using Groq's high-speed inference engine ensures response latencies under 500ms, making conversational RAG feel instantaneous.
+3. **Embedding Selection**: The `all-MiniLM-L6-v2` model is compact (80MB) and highly efficient, perfect for running locally on CPUs while maintaining excellent semantic search performance. For multilingual use cases, a model like `paraphrase-multilingual-MiniLM-L12-v2` is recommended.

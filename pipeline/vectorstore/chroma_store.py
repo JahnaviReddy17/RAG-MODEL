@@ -8,6 +8,13 @@ class VectorStore:
         self.client = chromadb.PersistentClient(path=persist_dir)
         self.collection = self.client.get_or_create_collection(collection_name)
 
+    def clear_collection(self):
+        try:
+            self.client.delete_collection(self.collection.name)
+            self.collection = self.client.get_or_create_collection(self.collection.name)
+        except Exception:
+            pass
+
     def add_documents(self, documents, embeddings):
         ids, texts, metas, embs = [], [], [], []
 

@@ -9,5 +9,6 @@ chromadb
 
 langchain-groq
 python-dotenv
-
 typesense
+streamlit
+python-docx
