@@ -1,4 +1,3 @@
-
 ---
 title: Agentic RAG Document Assistant
 emoji: 🤖
@@ -8,7 +7,7 @@ sdk: docker
 app_file: ui.py
 python_version: "3.11"
 pinned: false
-----
+---
 
 
 
