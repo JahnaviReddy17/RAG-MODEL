@@ -1,3 +1,19 @@
+
+---
+title: Agentic RAG Document Assistant
+emoji: 🤖
+colorFrom: indigo
+colorTo: purple
+sdk: docker
+app_file: ui.py
+python_version: "3.11"
+pinned: false
+----
+
+
+
+
+
 # 🤖 Agentic RAG Document Assistant
 
 An advanced, highly structured, and custom-styled **Retrieval-Augmented Generation (RAG)** pipeline. This application reads a variety of document formats, builds semantic vector indexes, retrieves context-relevant snippets, and leverages Large Language Models (LLMs) with strict factual grounding rules to eliminate hallucinations.

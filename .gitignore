@@ -3,3 +3,9 @@
 
 .ipynb_checkpoints/
 __pycache__/
+
+
+data/vector_store/
+data/uploaded_pdfs/
+research/*.index
+research/*.json
