@@ -116,7 +116,7 @@ st.markdown("""
 # 3.1 API Key checking in main dashboard if not loaded from .env
 if not api_key:
     st.warning("⚠️ Groq API Key not detected in `.env` environment file.")
-    api_key = st.text_input("Enter your Groq API Key to proceed:", type="password", help="Get a free key from console.groq.com")
+    api_key = st.text_input("Enter your Groq API Key to proceed: --{Use this for reference : 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}-- ", type="password", help="Get a free key from console.groq.com")
     if api_key:
         st.success("🔑 API Key configured successfully from input!")
 
